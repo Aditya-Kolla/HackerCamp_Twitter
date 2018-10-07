@@ -1,0 +1,19 @@
+{
+  "name": "hackercamp",
+  "version": "1.0.0",
+  "description": "Assignment for the application of HackerCamp Internship",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Aditya Kolla",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.3",
+    "mongoose": "^5.3.1",
+    "mongoose-paginate": "^5.0.3",
+    "twitter": "^1.7.1"
+  }
+}
