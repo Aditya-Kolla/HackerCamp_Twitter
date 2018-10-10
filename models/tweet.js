@@ -1,58 +1,42 @@
 const mongoosePaginate  = require('mongoose-paginate');
 const mongoose          = require('mongoose');
+const helper            = require('../helper/');
 
+//Defining the tweet Schema for structure
 var tweetSchema = new mongoose.Schema({
     twid: String,
     body: String,
     created_date: Date,
-    user: {
-        name: String,
-        screenname: String,
-        id: String,
-        avatar: String,
-        followers: Number,
-        friends: Number,
-
-    },
+    username: String,
+    screenname: String,
+    usid: String,
+    avatar: String,
+    followers: Number,
+    friends: Number,
     retweet_count: Number,
     favorite_count: Number,
-    entities: {
-        hashtags: Array,
-        urls: Array,
-        user_mentions: Array,
-    },
+    hashtags: Array,
+    urls: Array,
+    user_mentions: Array,
     save_date: {type: Date, default: Date.now()},
     search_word: String,
 });
 
 tweetSchema.plugin(mongoosePaginate);
 
-// tweetSchema.statics.getTweets = (keyword ,page, skip, callback) => {
-//     let tweets = [],
-//         start = (page * 10) + (skip * 1);
-
-//     Tweet.find({search_word: keyword}).sort({date: 'desc'}).exec(function(err, docs){
-//         if(!err){
-//             tweets = docs;
-//         }else {
-//             res.json(err);
-//         }
-//         callback(tweets);
-//     });
-// };
-
-
-tweetSchema.statics.getAltTweets = (keyword, page, limit, sort_by, order, callback) =>{
-    if(order=="asc")order=1;
-    else if(order=="desc") order = -1;
-    console.log(order + " is the order");
-    var query = { 
-        search_word: keyword 
+//Method to get data from the database
+tweetSchema.statics.getTweets = (keyword, contains, filter, select, page, limit, sort_by, order, callback) =>{
+    let orderNum = helper.getOrder(order);
+    var query = {
+        search_word: keyword, 
+        body: new RegExp(contains, 'i'), 
     };
+    console.log(filter);
     var options = {
         page: page,
         limit: limit,
-        sort: {[sort_by]: order}
+        select: select,
+        sort: {[sort_by]: orderNum},
     };
 
     Tweet.paginate(query, options, (err, result) => {
