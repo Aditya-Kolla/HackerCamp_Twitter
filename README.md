@@ -49,7 +49,7 @@
     *   _order\_by:_ whether ascending(asc) or descending(desc) 
     
     _Result:_ a JSON error is returned if the operation fails, otherwise the tweets satisfying the query.
-*   _/api/tweets/csv/:key_  
+*   _/api/tweets/csv/"key"_  
     _Parameters:_
     
     *   Same as /api/tweets/"key"
