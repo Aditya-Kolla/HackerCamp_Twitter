@@ -3,7 +3,6 @@ require('dotenv').load();
 const Twitter   = require('twitter'),
     bodyParser  = require('body-parser'),
     mongoose    = require('mongoose'),
-    http        = require('http');
     express     = require('express'),
     Tweet       = require('./models/tweet'),
     helper      = require('./helper'),
@@ -14,8 +13,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 
-var server = require('http').createServer(app);
-var io = require('socket.io').listen(server);
+
 
 mongoose.connect('mongodb://localhost/hackercamp_twitter', { useNewUrlParser: true });
 
@@ -28,10 +26,13 @@ const client = new Twitter({
     access_token_secret:process.env.ACCESS_SECRET
 });
 
+//Base route
 app.get("/", (req, res) =>{
     res.status(200).json({message: 'Welcome to the API'});
 });
 
+
+//Search route. Will store results in the DB.
 app.get("/api/tweets/search", (req, res) => {
     let keyword = req.query.q || "";
     let count = req.query.count || 15;
@@ -68,6 +69,7 @@ app.get("/api/tweets/search", (req, res) => {
     });
 });
 
+//Stream route. Will start the stream.  Not properly implemented.
 app.get("/api/tweets/stream", (req, res) => {
     let keyword = req.query.q;
     client.stream('statuses/filter', { track: keyword, tweet_mode: 'extended'}, stream => {
@@ -85,14 +87,15 @@ app.get("/api/tweets/stream", (req, res) => {
                     res.status(400).json(err);
                 } else {
                     // If everything is cool
-                    res.status(200).json(tweet);
                     console.log("Saved.");
                 }
             });
         });
+        res.status(200).json({success: "Stream has been started"});
     });
 });
 
+//Key is the keyword by for which we did a search
 app.get("/api/tweets/:key", (req, res) => {
     let page = Number(req.query.page) || 1;
     let limit = Number(req.query.limit) || 10;
@@ -101,13 +104,13 @@ app.get("/api/tweets/:key", (req, res) => {
     let order = req.query.order_by || "1";
     let keyword = req.params.key;
     let select = req.query.select || "";
-    let filter = req.query.filter || "";
 
-    Tweet.getTweets(keyword, contains, filter, select, page, limit, sort, order, (tweets) => {
+    Tweet.getTweets(keyword, contains, select, page, limit, sort, order, (tweets) => {
         res.status(200).json(tweets);
     });
 });
 
+//Route to export the results as csv
 app.get("/api/tweets/csv/:key", (req, res) => {
     let page = Number(req.query.page) || 1;
     let limit = Number(req.query.limit) || 10;
@@ -120,7 +123,7 @@ app.get("/api/tweets/csv/:key", (req, res) => {
     var filename = keyword + "_tweets.csv"
     var array;
 
-    Tweet.getAltTweets(keyword, filter, select, page, limit, sort, order, (tweets) => {
+    Tweet.getTweets(keyword, filter, select, page, limit, sort, order, (tweets) => {
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader("Content-Disposition", 'attachment; filename=' + filename);
         console.log(tweets.docs);
@@ -128,6 +131,7 @@ app.get("/api/tweets/csv/:key", (req, res) => {
     });
 });
 
-server.listen(PORT, 'localhost', () => {
+//Starts the server 
+app.listen(PORT, 'localhost', () => {
     console.log("The server is running at port " + PORT);
 });

@@ -1,6 +1,7 @@
 const mongoosePaginate  = require('mongoose-paginate');
 const mongoose          = require('mongoose');
 const helper            = require('../helper/');
+//Importing necessary packages
 
 //Defining the tweet Schema for structure
 var tweetSchema = new mongoose.Schema({
@@ -25,13 +26,13 @@ var tweetSchema = new mongoose.Schema({
 tweetSchema.plugin(mongoosePaginate);
 
 //Method to get data from the database
-tweetSchema.statics.getTweets = (keyword, contains, filter, select, page, limit, sort_by, order, callback) =>{
+tweetSchema.statics.getTweets = (keyword, contains, select, page, limit, sort_by, order, callback) =>{
     let orderNum = helper.getOrder(order);
     var query = {
         search_word: keyword, 
         body: new RegExp(contains, 'i'), 
     };
-    console.log(filter);
+
     var options = {
         page: page,
         limit: limit,
@@ -39,6 +40,7 @@ tweetSchema.statics.getTweets = (keyword, contains, filter, select, page, limit,
         sort: {[sort_by]: orderNum},
     };
 
+    //Takes two parameters, query and options which are both objects
     Tweet.paginate(query, options, (err, result) => {
         if (err) {
             callback(err);

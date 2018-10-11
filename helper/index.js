@@ -22,10 +22,8 @@ helperObj.setTweetModel = (data) => {
     return tweet;
 }
 
-helperObj.doFilter = string => {
 
-}
-
+//To determine order in numeric form.
 helperObj.getOrder = order => {
     return (order==="asc" ? 1 : -1);
 }
